@@ -11,36 +11,14 @@ import {
   Link,
   Redirect,
   useLocation,
+  useHistory,
 } from "react-router-dom";
 
-import logo from './logo.svg';
 import './App.css';
 
-const authContext = createContext();
+import { authContext, useAuth, useProvideAuth } from './auth.js';
 
-export const useAuth = () => {
-  return useContext(authContext);
-};
-
-function useProvideAuth() {
-  const [token, setToken] = useState(localStorage.getItem('userToken'));
-  useEffect(() => {
-    if (token != null) {
-      localStorage.setItem('userToken', token);
-    } else {
-      localStorage.removeItem('userToken');
-    }
-  })
-  function logout() {
-    setToken(null);
-    localStorage.removeItem('userToken');
-  }
-  return {
-    token,
-    setToken,
-    logout,
-  };
-}
+import { useApi } from './api.js';
 
 export default function App() {
   const auth = useProvideAuth();
@@ -53,10 +31,9 @@ export default function App() {
           <li><Link to="/">Home</Link></li>
           {auth.token != null ? (
         <>
-          <li>wtf: {auth.token}</li>
           <li><Link to="/networks">Networks</Link></li>
           <li><Link to="/admin">Admin</Link></li>
-          <li><Link to="" onClick={auth.logout}>Logout</Link></li>
+          <li><Link to="/" onClick={auth.logout}>Logout</Link></li>
         </>
         ) : (
         <>
@@ -86,10 +63,12 @@ export default function App() {
 }
 
 function Home() {
+  const resp = useApi('GET', '/api/debug/status', null);
   return (
     <div>
       <h2>Wiregarden console</h2>
       <p>This is the home console for wiregarden.</p>
+      <p>{resp.loading ? <span>Loading...</span> : <span>Boing! Boing! The current time is... {resp.response.Server.LocalTime}</span>}</p>
     </div>
   );
 }
@@ -123,14 +102,22 @@ function useInput(initialValue){
 function Login() {
   const [input, setInput] = useInput('');
   const auth = useAuth();
+  let history = useHistory();
+  let location = useLocation();
+  let { from } = location.state || { from: { pathname: "/" } };
   function handleLogin(e) {
     e.preventDefault();
-    auth.setToken(input);
+    if (input != "") {
+      auth.setToken(input);
+      history.replace(from);
+    } else {
+      // TODO: flash message
+    }
   }
   return (
     <form>
-      <input placeholder="User Token" type="textarea" value={input} onChange={setInput} />
-      <button onClick={handleLogin}>Login</button>
+      <div><textarea placeholder="User Token" value={input} onChange={setInput} /></div>
+      <div><button onClick={handleLogin}>Login</button></div>
     </form>
   );
 }
