@@ -22,7 +22,6 @@ import { useApi } from './api.js';
 
 export default function App() {
   const auth = useProvideAuth();
-  console.log(auth);
   return (
     <authContext.Provider value={auth}>
     <Router>
@@ -31,7 +30,6 @@ export default function App() {
           <li><Link to="/">Home</Link></li>
           {auth.token != null ? (
         <>
-          <li><Link to="/networks">Networks</Link></li>
           <li><Link to="/admin">Admin</Link></li>
           <li><Link to="/" onClick={auth.logout}>Logout</Link></li>
         </>
@@ -44,10 +42,7 @@ export default function App() {
         <hr />
         <Switch>
           <Route exact path="/">
-            <Home />
-          </Route>
-          <Route exact path="/networks">
-            <Networks />
+          {auth.token != null ? (<Subscriptions />) : (<Home />)}
           </Route>
           <Route exact path="/admin">
             <Admin />
@@ -62,22 +57,81 @@ export default function App() {
   );
 }
 
+//  const resp = useApi('GET', '/api/debug/status', true);
+      //<p>{resp.loading ? <span>Loading...</span> : <span>Boing! Boing! The current time is... {resp.response.Server.LocalTime}</span>}</p>
+      //
 function Home() {
-  const resp = useApi('GET', '/api/debug/status', null);
   return (
     <div>
       <h2>Wiregarden console</h2>
       <p>This is the home console for wiregarden.</p>
-      <p>{resp.loading ? <span>Loading...</span> : <span>Boing! Boing! The current time is... {resp.response.Server.LocalTime}</span>}</p>
     </div>
   );
 }
 
+const SubscriptionContext = createContext("subscription");
+
+function Subscriptions() {
+  const user = useApi('GET', '/api/v1/user', true);
+  const subs = useApi('GET', '/api/v1/subscription', true);
+  const whoami = useApi('GET', '/api/v1/whoami', false);
+  const [selected,setSelected] = useState(null);
+  const [subToken,setSubToken] = useState(null);
+  function setSubscription(s) {
+    setSelected(s);
+    setSubToken((s !== null) ? s.tokens[0].token : null);
+  }
+  if ((user.response == null) || (subs.response == null)) {
+    return "Loading..."
+  } else {
+    return (
+      <SubscriptionContext.Provider value={selected}>
+      <div>
+        <h2>Subscriptions for {user.response.name}</h2>
+        <p>{JSON.stringify(subs.response.subscriptions)}</p>
+        <ul>
+        {subs.response.subscriptions.map((sub) => {
+          return <li key={sub.id}><nav onClick={(e) => {setSubscription(sub);}}><Subscription sub={sub} /></nav></li>
+        })}
+        </ul>
+      </div>
+      {subToken !== null ? (
+      <authContext.Provider value={{token: subToken}}>
+        <Networks />
+      </authContext.Provider>
+      ) : (<></>)}
+      </SubscriptionContext.Provider>
+    );
+  }
+}
+
+function Subscription(props) {
+  const sub = props.sub;
+  const selected = useContext(SubscriptionContext);
+  const className = (selected !== null && selected.id === sub.id) ? "selected" : "not-selected";
+  return <div className={className}>
+    <h3>{sub.plan.name}</h3>
+    <table><tbody>
+      <tr><th>Created</th><td>{sub.created}</td></tr>
+      <tr><th>ID</th><td>{sub.id}</td></tr>
+      <tr><th>Plan</th><td>{JSON.stringify(sub.plan)}</td></tr>
+    </tbody></table>
+  </div>
+}
+
 function Networks() {
+  const sub = useContext(SubscriptionContext);
+  const token = useContext(authContext);
+  const networks = useApi('GET', '/api/v1/device', true);
+  console.log("sub", sub.id, "token", token, "networks", networks);
   return (
     <div>
       <h2>Networks</h2>
-      <p>TODO: manage networks here</p>
+      {networks.response == null ? (
+      <p>Loading...</p>
+      ) : (
+      <p>{JSON.stringify(networks)}</p>
+      )}
     </div>
   );
 }
@@ -107,7 +161,7 @@ function Login() {
   let { from } = location.state || { from: { pathname: "/" } };
   function handleLogin(e) {
     e.preventDefault();
-    if (input != "") {
+    if (input !== "") {
       auth.setToken(input);
       history.replace(from);
     } else {
