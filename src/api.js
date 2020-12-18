@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useAuth } from "./auth.js";
 
-export function useApi(method, url, asJson, body) {
+export function useApi(props) {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,18 +11,18 @@ export function useApi(method, url, asJson, body) {
   async function fetchApi() {
     try {
       setLoading(true);
-      let resp = await fetch(url, {
+      let resp = await fetch(props.url, {
         headers: {
           'Authorization': `Bearer ${auth.token}`,
           'Content-Type': 'application/json',
         },
-        method,
-        body,
+        method: props.method,
+        body: props.body,
       });
       if (!resp.ok) {
         throw new Error(`HTTP ${resp.status}: ${resp.data || ''}`);
       }
-      if (asJson) {
+      if (props.asJson) {
         let respJson = await resp.json();
         setResponse(respJson);
       } else {
@@ -35,10 +35,9 @@ export function useApi(method, url, asJson, body) {
       setLoading(false);
     }
   }
-
   useEffect(() => {
     fetchApi();
-  }, []);
+  }, [props.cond]);
 
   return {response, error, loading};
 }

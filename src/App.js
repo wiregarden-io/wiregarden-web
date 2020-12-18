@@ -72,9 +72,9 @@ function Home() {
 const SubscriptionContext = createContext("subscription");
 
 function Subscriptions() {
-  const user = useApi('GET', '/api/v1/user', true);
-  const subs = useApi('GET', '/api/v1/subscription', true);
-  const whoami = useApi('GET', '/api/v1/whoami', false);
+  const user = useApi({method: 'GET', url: '/api/v1/user', asJson: true});
+  const subs = useApi({method: 'GET', url: '/api/v1/subscription', asJson: true});
+  const whoami = useApi({method: 'GET', url: '/api/v1/whoami', asJson: false});
   const [selected,setSelected] = useState(null);
   const [subToken,setSubToken] = useState(null);
   function setSubscription(s) {
@@ -122,8 +122,7 @@ function Subscription(props) {
 function Networks() {
   const sub = useContext(SubscriptionContext);
   const token = useContext(authContext);
-  const networks = useApi('GET', '/api/v1/device', true);
-  console.log("sub", sub.id, "token", token, "networks", networks);
+  const networks = useApi({method: 'GET', url: '/api/v1/device', asJson: true, cond: token});
   return (
     <div>
       <h2>Networks</h2>
