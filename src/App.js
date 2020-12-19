@@ -97,7 +97,7 @@ function Subscriptions() {
       </div>
       {subToken !== null ? (
       <authContext.Provider value={{token: subToken}}>
-        <Networks />
+        <Devices />
       </authContext.Provider>
       ) : (<></>)}
       </SubscriptionContext.Provider>
@@ -119,20 +119,50 @@ function Subscription(props) {
   </div>
 }
 
-function Networks() {
+function Devices() {
   const sub = useContext(SubscriptionContext);
   const token = useContext(authContext);
-  const networks = useApi({method: 'GET', url: '/api/v1/device', asJson: true, cond: token});
+  const devices = useApi({method: 'GET', url: '/api/v1/device', asJson: true, cond: token});
   return (
     <div>
       <h2>Networks</h2>
-      {networks.response == null ? (
+      {devices.response == null ? (
       <p>Loading...</p>
       ) : (
-      <p>{JSON.stringify(networks)}</p>
+      devicesByNetwork(devices.response.devices).map((n) => {
+      return <>
+      <h3>{n.networkName}</h3>
+      <table><thead>
+      <tr><th>Subnet</th><td>{n.subnet}</td></tr>
+      <tr><th>Device</th><th>Address</th><th>Public key</th><th>Rendezvous</th></tr>
+      </thead><tbody>
+      {n.devices.map((d) => {
+        return <tr key={d.device.id}><td>{d.device.name}</td><td>{d.device.addr}</td><td>{d.device.publicKey}</td><td>{d.device.endpoint}</td></tr>;
+      })}
+      </tbody></table>
+      </>
+      })
       )}
     </div>
   );
+}
+
+function devicesByNetwork(devices) {
+  const grouped = devices.reduce((acc, value) => {
+    if (!acc[value.network.name]) {
+      acc[value.network.name] = [];
+    }
+    acc[value.network.name].push(value);
+    return acc;
+  }, {});
+  var result = [];
+  for (var key in grouped) {
+    var network = {networkName: key, subnet: grouped[key][0].network.address, devices: grouped[key]};
+    network.devices.sort((a, b) => {return a.device.name < b.device.name});
+    result.push(network);
+  }
+  result.sort((a, b) => {return a.networkName < b.networkName});
+  return result;
 }
 
 function Admin() {
