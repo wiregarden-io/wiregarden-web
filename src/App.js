@@ -13,6 +13,7 @@ import {
   useLocation,
   useHistory,
 } from "react-router-dom";
+import { Container, Nav, Row, Col } from "react-bootstrap";
 
 import './App.css';
 
@@ -25,41 +26,32 @@ export default function App() {
   return (
     <authContext.Provider value={auth}>
     <Router>
-      <div>
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          {auth.token != null ? (
-        <>
-          <li><Link to="/admin">Admin</Link></li>
-          <li><Link to="/" onClick={auth.logout}>Logout</Link></li>
-        </>
-        ) : (
-        <>
-          <li><Link to="/login">Login</Link></li>
-        </>
-        )}
-        </ul>
-        <hr />
-        <Switch>
-          <Route exact path="/">
-          {auth.token != null ? (<Subscriptions />) : (<Home />)}
-          </Route>
-          <Route exact path="/admin">
-            <Admin />
-          </Route>
-          <Route exact path="/login">
-            <Login />
-          </Route>
-        </Switch>
-      </div>
+      <Nav activeKey="/">
+        <Nav.Link as={Link} to="/">Home</Nav.Link>
+      {auth.token != null ? (
+      <>
+        <Nav.Link as={Link} onClick={auth.logout}>Logout</Nav.Link>
+      </>
+      ) : (
+      <>
+        <Nav.Link as={Link} to="/login">Login</Nav.Link>
+      </>
+      )}
+      </Nav>
+      <hr />
+      <Switch>
+        <Route exact path="/">
+        {auth.token != null ? (<Subscriptions />) : (<Home />)}
+        </Route>
+        <Route exact path="/login">
+          <Login />
+        </Route>
+      </Switch>
     </Router>
     </authContext.Provider>
   );
 }
 
-//  const resp = useApi('GET', '/api/debug/status', true);
-      //<p>{resp.loading ? <span>Loading...</span> : <span>Boing! Boing! The current time is... {resp.response.Server.LocalTime}</span>}</p>
-      //
 function Home() {
   return (
     <div>
@@ -86,20 +78,23 @@ function Subscriptions() {
   } else {
     return (
       <SubscriptionContext.Provider value={selected}>
-      <div>
+      <Container><Row>
+        <Col>
         <h2>Subscriptions for {user.response.name}</h2>
-        <p>{JSON.stringify(subs.response.subscriptions)}</p>
-        <ul>
+        <Nav>
         {subs.response.subscriptions.map((sub) => {
-          return <li key={sub.id}><nav onClick={(e) => {setSubscription(sub);}}><Subscription sub={sub} /></nav></li>
+          return <Nav.Item key={sub.id} onClick={(e) => {setSubscription(sub);}}><Subscription sub={sub} /></Nav.Item>
         })}
-        </ul>
-      </div>
+        </Nav>
+        </Col>
+        <Col>
       {subToken !== null ? (
       <authContext.Provider value={{token: subToken}}>
         <Devices />
       </authContext.Provider>
       ) : (<></>)}
+        </Col>
+      </Row></Container>
       </SubscriptionContext.Provider>
     );
   }
@@ -163,15 +158,6 @@ function devicesByNetwork(devices) {
   }
   result.sort((a, b) => {return a.networkName < b.networkName});
   return result;
-}
-
-function Admin() {
-  return (
-    <div>
-      <h2>Admin</h2>
-      <p>TODO: manage subscriptions, users, sharing, etc.</p>
-    </div>
-  );
 }
 
 function useInput(initialValue){
