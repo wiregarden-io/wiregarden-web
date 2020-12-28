@@ -13,7 +13,14 @@ import {
   useLocation,
   useHistory,
 } from "react-router-dom";
-import { Container, Nav, Row, Col } from "react-bootstrap";
+import {
+  Container,
+  Nav,
+  Row,
+  Col,
+  Table,
+  ListGroup,
+} from "react-bootstrap";
 
 import './App.css';
 
@@ -78,8 +85,8 @@ function Subscriptions() {
   } else {
     return (
       <SubscriptionContext.Provider value={selected}>
-      <Container><Row>
-        <Col>
+      <Container fluid><Row noGutters={true} md={10}>
+        <Col md={3}>
         <h2>Subscriptions for {user.response.name}</h2>
         <Nav>
         {subs.response.subscriptions.map((sub) => {
@@ -87,7 +94,7 @@ function Subscriptions() {
         })}
         </Nav>
         </Col>
-        <Col>
+        <Col md="auto">
       {subToken !== null ? (
       <authContext.Provider value={{token: subToken}}>
         <Devices />
@@ -104,14 +111,14 @@ function Subscription(props) {
   const sub = props.sub;
   const selected = useContext(SubscriptionContext);
   const className = (selected !== null && selected.id === sub.id) ? "selected" : "not-selected";
-  return <div className={className}>
+  return <Container className={className}>
     <h3>{sub.plan.name}</h3>
-    <table><tbody>
-      <tr><th>Created</th><td>{sub.created}</td></tr>
-      <tr><th>ID</th><td>{sub.id}</td></tr>
-      <tr><th>Plan</th><td>{JSON.stringify(sub.plan)}</td></tr>
-    </tbody></table>
-  </div>
+    <ListGroup>
+      <ListGroup.Item>{sub.id}</ListGroup.Item>
+      <ListGroup.Item>Created at {sub.created}</ListGroup.Item>
+      <ListGroup.Item><pre>{JSON.stringify(sub.plan, null, '  ')}</pre></ListGroup.Item>
+    </ListGroup>
+  </Container>
 }
 
 function Devices() {
@@ -119,7 +126,7 @@ function Devices() {
   const token = useContext(authContext);
   const devices = useApi({method: 'GET', url: '/api/v1/device', asJson: true, cond: token});
   return (
-    <div>
+    <Container fluid>
       <h2>Networks</h2>
       {devices.response == null ? (
       <p>Loading...</p>
@@ -127,18 +134,18 @@ function Devices() {
       devicesByNetwork(devices.response.devices).map((n) => {
       return <>
       <h3>{n.networkName}</h3>
-      <table><thead>
+      <Table size="sm" responsive="sm" striped border hover><thead>
       <tr><th>Subnet</th><td>{n.subnet}</td></tr>
       <tr><th>Device</th><th>Address</th><th>Public key</th><th>Rendezvous</th></tr>
       </thead><tbody>
       {n.devices.map((d) => {
         return <tr key={d.device.id}><td>{d.device.name}</td><td>{d.device.addr}</td><td>{d.device.publicKey}</td><td>{d.device.endpoint}</td></tr>;
       })}
-      </tbody></table>
+      </tbody></Table>
       </>
       })
       )}
-    </div>
+    </Container>
   );
 }
 
