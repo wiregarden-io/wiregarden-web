@@ -2,12 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { Auth0Provider } from "@auth0/auth0-react";
+
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cosmo/bootstrap.min.css" crossorigin="anonymous" />
+  <Auth0Provider domain="wiregarden.us.auth0.com" clientId="rdNl3ihM3F21ec5KGLh6rp7f1VHpJuIp" redirectUri={window.location.origin}>
     <App />
+  </Auth0Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

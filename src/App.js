@@ -15,14 +15,26 @@ import {
 } from "react-router-dom";
 import {
   Container,
-  Navbar, Nav, Row, Col,
+  Navbar, Nav, Row, Col, Dropdown,
   Table,
   Card,
 } from "react-bootstrap";
 
 import { authContext, useAuth, useProvideAuth } from './auth.js';
 
+import { useAuth0 } from "@auth0/auth0-react";
+
 import { useApi } from './api.js';
+
+const LoginButton = () => {
+  const { loginWithRedirect } = useAuth0();
+  return <button onClick={() => loginWithRedirect()}>Auth0 Login</button>;
+};
+
+const LogoutButton = () => {
+  const { logout } = useAuth0();
+  return <button onClick={() => logout({ returnTo: window.location.origin })}>Auth0 Logout</button>;
+};
 
 export default function App() {
   const auth = useProvideAuth();
@@ -33,7 +45,9 @@ export default function App() {
       <Navbar.Brand href="/">Wiregarden</Navbar.Brand>
       <Nav activeKey="/" className="mr-auto">
         <Nav.Link as={Link} to="/">Home</Nav.Link>
-      </Nav><Nav>
+      </Nav>
+      <Auth0Nav />
+      <Nav>
       {auth.token != null ? (
       <>
         <Nav.Link as={Link} onClick={auth.logout}>Logout</Nav.Link>
@@ -56,6 +70,26 @@ export default function App() {
     </Router>
     </authContext.Provider>
   );
+}
+
+function Auth0Nav() {
+  const { user, isAuthenticated, isLoading } = useAuth0();
+  if (isLoading) {
+    return <Nav>Loading...</Nav>;
+  }
+  if (isAuthenticated) {
+    return <Nav><Dropdown as={Nav.Item}>
+      <Dropdown.Toggle as={Nav.Link}>
+        <img height={32} width="auto" src={user.picture} alt={user.name} />
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        <Dropdown.Header>Signed in as {user.name}</Dropdown.Header>
+        <Dropdown.Item><LogoutButton /></Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown></Nav>;
+  } else {
+    return <Nav><LoginButton /></Nav>;
+  }
 }
 
 function Home() {
@@ -110,11 +144,11 @@ function Subscription(props) {
   const selected = useContext(SubscriptionContext);
   const variant = (selected !== null && selected.id === sub.id) ? "primary" : "";
   return <Container>
-	<Card border={variant}>
+    <Card border={variant}>
     <Card.Body>
       <Card.Title>{sub.plan.name}</Card.Title>
       <Card.Text>
-        <dl class="dl-horizontal">
+        <dl className="dl-horizontal">
           <dt>ID</dt><dd>{sub.id}</dd>
           <dt>Created</dt><dd>{sub.created}</dd>
           <dt>Plan</dt><dd><pre>{JSON.stringify(sub.plan, null, '  ')}</pre></dd>
@@ -138,7 +172,7 @@ function Devices() {
       devicesByNetwork(devices.response.devices).map((n) => {
       return <>
       <h3>{n.networkName}</h3>
-      <Table size="sm" responsive striped border hover><thead>
+      <Table size="sm" responsive striped border={true} hover><thead>
       <tr><th>Subnet</th><td>{n.subnet}</td></tr>
       <tr><th>Device</th><th>Address</th><th>Public key</th><th>Rendezvous</th></tr>
       </thead><tbody>
@@ -154,6 +188,9 @@ function Devices() {
 }
 
 function devicesByNetwork(devices) {
+  if (devices == null) {
+    devices = [];
+  }
   const grouped = devices.reduce((acc, value) => {
     if (!acc[value.network.name]) {
       acc[value.network.name] = [];
