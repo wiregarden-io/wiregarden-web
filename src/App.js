@@ -15,11 +15,8 @@ import {
 } from "react-router-dom";
 import {
   Container,
-  Nav,
-  Row,
-  Col,
+  Navbar, Nav, Row, Col,
   Table,
-  ListGroup,
   Card,
 } from "react-bootstrap";
 
@@ -32,8 +29,11 @@ export default function App() {
   return (
     <authContext.Provider value={auth}>
     <Router>
-      <Nav activeKey="/">
+      <Navbar bg="light">
+      <Navbar.Brand href="/">Wiregarden</Navbar.Brand>
+      <Nav activeKey="/" className="mr-auto">
         <Nav.Link as={Link} to="/">Home</Nav.Link>
+      </Nav><Nav>
       {auth.token != null ? (
       <>
         <Nav.Link as={Link} onClick={auth.logout}>Logout</Nav.Link>
@@ -44,7 +44,7 @@ export default function App() {
       </>
       )}
       </Nav>
-      <hr />
+      </Navbar>
       <Switch>
         <Route exact path="/">
         {auth.token != null ? (<Subscriptions />) : (<Home />)}
@@ -72,7 +72,6 @@ const SubscriptionContext = createContext("subscription");
 function Subscriptions() {
   const user = useApi({method: 'GET', url: '/api/v1/user', asJson: true});
   const subs = useApi({method: 'GET', url: '/api/v1/subscription', asJson: true});
-  const whoami = useApi({method: 'GET', url: '/api/v1/whoami', asJson: false});
   const [selected,setSelected] = useState(null);
   const [subToken,setSubToken] = useState(null);
   function setSubscription(s) {
@@ -84,16 +83,16 @@ function Subscriptions() {
   } else {
     return (
       <SubscriptionContext.Provider value={selected}>
-      <Container fluid><Row noGutters={true} md={10}>
-        <Col md={3}>
-        <h2>Subscriptions for {user.response.name}</h2>
+      <h3>Subscriptions for {user.response.name}</h3>
+      <Container fluid><Row>
+        <Col sm={12} md={3}>
         <Nav>
         {subs.response.subscriptions.map((sub) => {
           return <Nav.Item key={sub.id} onClick={(e) => {setSubscription(sub);}}><Subscription sub={sub} /></Nav.Item>
         })}
         </Nav>
         </Col>
-        <Col md="auto">
+        <Col sm={12} md={9}>
       {subToken !== null ? (
       <authContext.Provider value={{token: subToken}}>
         <Devices />
@@ -139,7 +138,7 @@ function Devices() {
       devicesByNetwork(devices.response.devices).map((n) => {
       return <>
       <h3>{n.networkName}</h3>
-      <Table size="sm" striped border hover><thead>
+      <Table size="sm" responsive striped border hover><thead>
       <tr><th>Subnet</th><td>{n.subnet}</td></tr>
       <tr><th>Device</th><th>Address</th><th>Public key</th><th>Rendezvous</th></tr>
       </thead><tbody>
