@@ -84,15 +84,15 @@ function Subscriptions() {
     return (
       <SubscriptionContext.Provider value={selected}>
       <h3>Subscriptions for {user.response.name}</h3>
-      <Container fluid><Row>
-        <Col sm={12} md={3}>
+      <Container fluid><Row noGutters>
+        <Col sm={12} md={4} lg={4} xl={3}>
         <Nav>
         {subs.response.subscriptions.map((sub) => {
           return <Nav.Item key={sub.id} onClick={(e) => {setSubscription(sub);}}><Subscription sub={sub} /></Nav.Item>
         })}
         </Nav>
         </Col>
-        <Col sm={12} md={9}>
+        <Col sm={12} md={8} lg={8} xl={9}>
       {subToken !== null ? (
       <authContext.Provider value={{token: subToken}}>
         <Devices />
