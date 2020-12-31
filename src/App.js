@@ -20,9 +20,8 @@ import {
   Col,
   Table,
   ListGroup,
+  Card,
 } from "react-bootstrap";
-
-import './App.css';
 
 import { authContext, useAuth, useProvideAuth } from './auth.js';
 
@@ -110,14 +109,20 @@ function Subscriptions() {
 function Subscription(props) {
   const sub = props.sub;
   const selected = useContext(SubscriptionContext);
-  const className = (selected !== null && selected.id === sub.id) ? "selected" : "not-selected";
-  return <Container className={className}>
-    <h3>{sub.plan.name}</h3>
-    <ListGroup>
-      <ListGroup.Item>{sub.id}</ListGroup.Item>
-      <ListGroup.Item>Created at {sub.created}</ListGroup.Item>
-      <ListGroup.Item><pre>{JSON.stringify(sub.plan, null, '  ')}</pre></ListGroup.Item>
-    </ListGroup>
+  const variant = (selected !== null && selected.id === sub.id) ? "primary" : "";
+  return <Container>
+	<Card border={variant}>
+    <Card.Body>
+      <Card.Title>{sub.plan.name}</Card.Title>
+      <Card.Text>
+        <dl class="dl-horizontal">
+          <dt>ID</dt><dd>{sub.id}</dd>
+          <dt>Created</dt><dd>{sub.created}</dd>
+          <dt>Plan</dt><dd><pre>{JSON.stringify(sub.plan, null, '  ')}</pre></dd>
+        </dl>
+      </Card.Text>
+    </Card.Body>
+  </Card>
   </Container>
 }
 
@@ -134,7 +139,7 @@ function Devices() {
       devicesByNetwork(devices.response.devices).map((n) => {
       return <>
       <h3>{n.networkName}</h3>
-      <Table size="sm" responsive="sm" striped border hover><thead>
+      <Table size="sm" striped border hover><thead>
       <tr><th>Subnet</th><td>{n.subnet}</td></tr>
       <tr><th>Device</th><th>Address</th><th>Public key</th><th>Rendezvous</th></tr>
       </thead><tbody>
