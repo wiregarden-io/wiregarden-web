@@ -1,7 +1,6 @@
 import React, {
   createContext,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import {
@@ -9,18 +8,18 @@ import {
   Switch,
   Route,
   Link,
-  Redirect,
   useLocation,
   useHistory,
 } from "react-router-dom";
 import {
   Container,
+  Button,
   Navbar, Nav, Row, Col, Dropdown,
   Table,
   Card,
 } from "react-bootstrap";
 
-import { authContext, useAuth, useProvideAuth } from './auth.js';
+import { authContext, useAuth } from './auth.js';
 
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -28,18 +27,17 @@ import { useApi } from './api.js';
 
 const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
-  return <button onClick={() => loginWithRedirect()}>Auth0 Login</button>;
+  return <Button variant="primary" onClick={() => loginWithRedirect()}>Login</Button>;
 };
 
 const LogoutButton = () => {
   const { logout } = useAuth0();
-  return <button onClick={() => logout({ returnTo: window.location.origin })}>Auth0 Logout</button>;
+  return <Button variant="secondary" onClick={() => logout({ returnTo: window.location.origin })}>Logout</Button>;
 };
 
 export default function App() {
-  const auth = useProvideAuth();
+  const { isAuthenticated } = useAuth0();
   return (
-    <authContext.Provider value={auth}>
     <Router>
       <Navbar bg="light">
       <Navbar.Brand href="/">Wiregarden</Navbar.Brand>
@@ -47,28 +45,16 @@ export default function App() {
         <Nav.Link as={Link} to="/">Home</Nav.Link>
       </Nav>
       <Auth0Nav />
-      <Nav>
-      {auth.token != null ? (
-      <>
-        <Nav.Link as={Link} onClick={auth.logout}>Logout</Nav.Link>
-      </>
-      ) : (
-      <>
-        <Nav.Link as={Link} to="/login">Login</Nav.Link>
-      </>
-      )}
-      </Nav>
       </Navbar>
       <Switch>
         <Route exact path="/">
-        {auth.token != null ? (<Subscriptions />) : (<Home />)}
+        {isAuthenticated ? (<Subscriptions />) : (<Home />)}
         </Route>
         <Route exact path="/login">
           <Login />
         </Route>
       </Switch>
     </Router>
-    </authContext.Provider>
   );
 }
 
@@ -160,7 +146,6 @@ function Subscription(props) {
 }
 
 function Devices() {
-  const sub = useContext(SubscriptionContext);
   const token = useContext(authContext);
   const devices = useApi({method: 'GET', url: '/api/v1/device', asJson: true, cond: token});
   return (
