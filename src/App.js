@@ -18,6 +18,7 @@ import {
   Table,
   Card,
   Spinner,
+  Jumbotron,
 } from "react-bootstrap";
 
 import { authContext, useAuth } from './auth.js';
@@ -29,11 +30,6 @@ import { useApi } from './api.js';
 const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
   return <Button variant="primary" onClick={() => loginWithRedirect()}>Login</Button>;
-};
-
-const LogoutButton = () => {
-  const { logout } = useAuth0();
-  return <Button variant="secondary" onClick={() => logout({ returnTo: window.location.origin })}>Logout</Button>;
 };
 
 export default function App() {
@@ -91,23 +87,17 @@ function Loading() {
 
 function About() {
   return <Container fluid>
-    <p>All about Wiregarden</p>
+    <Jumbotron>
+      <h3>Grow your own private networks with Wiregarden</h3>
+      <p>Wiregarden makes it easy to get started building your own private networks, secured by Wireguard.</p>
+    </Jumbotron>
   </Container>;
-}
-
-function PleaseLogin() {
-  return (
-    <div>
-      <h2>Wiregarden console</h2>
-      <p>This is the home console for wiregarden.</p>
-    </div>
-  );
 }
 
 const SubscriptionContext = createContext("subscription");
 
 function Subscriptions() {
-  const { user, isLoading } = useAuth0();
+  const { isLoading } = useAuth0();
   const subs = useApi({method: 'GET', url: '/api/v1/subscription', asJson: true});
   const [selected,setSelected] = useState(null);
   const [subToken,setSubToken] = useState(null);
