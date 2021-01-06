@@ -19,6 +19,7 @@ import {
   Card,
   Spinner,
   Jumbotron,
+  Carousel,
 } from "react-bootstrap";
 
 import { authContext, useAuth } from './auth.js';
@@ -87,10 +88,27 @@ function Loading() {
 
 function About() {
   return <Container fluid>
-    <Jumbotron>
-      <h3>Grow your own private networks with Wiregarden</h3>
-      <p>Wiregarden makes it easy to get started building your own private networks, secured by Wireguard.</p>
-    </Jumbotron>
+    <Carousel>
+      <Carousel.Item>
+        <Jumbotron>
+          <h3>Grow your own private networks with Wiregarden</h3>
+          <p>Wiregarden makes it easy to get started building your own private networks, secured by Wireguard.</p>
+        </Jumbotron>
+      </Carousel.Item>
+      <Carousel.Item>
+        <Jumbotron>
+          <h3>Stay connected, stay updated, automatically</h3>
+          <p>Wiregarden operates Wireguard to keep all your devices connected.</p>
+        </Jumbotron>
+      </Carousel.Item>
+      <Carousel.Item>
+        <Jumbotron>
+          <h3>Your devices, your networks, your way</h3>
+          <p>Log in with Github for convenience, or create your own account if you like.</p>
+          <p>Unlimited devices and networks allowed on hosted plans, priced by propagation of network changes.</p>
+        </Jumbotron>
+      </Carousel.Item>
+    </Carousel>
   </Container>;
 }
 
@@ -170,10 +188,10 @@ function DevicesByNetwork(props) {
     return <></>;
   }
   if (props.devices.response.devices == null) {
-    return <Container>
+    return <>
       <p>No devices found. Try adding some?</p>
       <GettingStarted />
-    </Container>;
+    </>;
   }
   return devicesByNetwork(props.devices.response.devices).map((n) => {
     return <>
@@ -213,12 +231,12 @@ function devicesByNetwork(devices) {
 
 function GettingStarted() {
   const token = useContext(authContext);
-  return <Container fluid>
-    <p><Link href="/install">Install Wiregarden</Link> and start a network on a device that will be network-accessible to all the others.</p>
+  return <>
+    <p><Link to="/install">Install Wiregarden</Link> and start a network on a device that will be network-accessible to all the others.</p>
     <p className="border"><code> sudo env WIREGARDEN_SUBSCRIPTION={token.token} wiregarden up --network my-net --endpoint my-public-ip:my-public-port</code></p>
     <p>Then add other devices to your network.</p>
     <p className="border"><code> sudo env WIREGARDEN_SUBSCRIPTION={token.token} wiregarden up --network my-net</code></p>
-  </Container>
+  </>
 }
 
 function useInput(initialValue){
