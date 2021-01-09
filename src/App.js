@@ -50,7 +50,7 @@ export default function App() {
         <Route exact path="/about"><About /></Route>
         <Route exact path="/console"><Subscriptions /></Route>
         <Route exact path="/login">
-          <Login />
+          <TokenLogin />
         </Route>
         <Route exact path="/install">
           <Install />
@@ -92,20 +92,13 @@ function About() {
       <Carousel.Item>
         <Jumbotron>
           <h3>Grow your own private networks with Wiregarden</h3>
-          <p>Wiregarden makes it easy to get started building your own private networks, secured by Wireguard.</p>
+          <p>Wiregarden makes it easy to get started building your own private networks, secured by <a href="https://www.wireguard.com/" target="_">Wireguard</a>.</p>
         </Jumbotron>
       </Carousel.Item>
       <Carousel.Item>
         <Jumbotron>
           <h3>Stay connected, stay updated, automatically</h3>
-          <p>Wiregarden operates Wireguard to keep all your devices connected.</p>
-        </Jumbotron>
-      </Carousel.Item>
-      <Carousel.Item>
-        <Jumbotron>
-          <h3>Your devices, your networks, your way</h3>
-          <p>Log in with Github for convenience, or create your own account if you like.</p>
-          <p>Unlimited devices and networks allowed on hosted plans, priced by propagation of network changes.</p>
+          <p>Wiregarden operates <a href="https://www.wireguard.com/" target="_">Wireguard</a> to keep all your devices connected.</p>
         </Jumbotron>
       </Carousel.Item>
     </Carousel>
@@ -123,6 +116,7 @@ function Subscriptions() {
     setSelected(s);
     setSubToken((s !== null) ? s.tokens[0].token : null);
   }
+  // TODO: apply setSubscription in a useEffect hook?
   if (isLoading || subs.loading) {
     return <Loading />;
   } else if (subs.response != null) {
@@ -158,12 +152,12 @@ function Subscription(props) {
     <Card border={variant}>
     <Card.Body>
       <Card.Title>{sub.plan.name}</Card.Title>
-      <Card.Text>
-        <dl className="dl-horizontal">
-          <dt>ID</dt><dd>{sub.id}</dd>
-          <dt>Created</dt><dd>{sub.created}</dd>
-          <dt>Plan</dt><dd><pre>{JSON.stringify(sub.plan, null, '  ')}</pre></dd>
-        </dl>
+      <Card.Text as="div">
+        <small>
+          <code>{sub.id}</code><br/>
+          <span>Created {sub.created}</span><br/>
+          <pre><code>{JSON.stringify(sub.plan, null, '  ')}</code></pre>
+        </small>
       </Card.Text>
     </Card.Body>
   </Card>
@@ -247,7 +241,7 @@ function useInput(initialValue){
   return [value,handleChange];
 }
 
-function Login() {
+function TokenLogin() {
   const [input, setInput] = useInput('');
   const auth = useAuth();
   let history = useHistory();
