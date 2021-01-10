@@ -2,6 +2,7 @@ import React, {
   createContext,
   useContext,
   useState,
+  useEffect,
 } from "react";
 import {
   BrowserRouter as Router,
@@ -117,6 +118,15 @@ function Subscriptions() {
     setSubToken((s !== null) ? s.tokens[0].token : null);
   }
   // TODO: apply setSubscription in a useEffect hook?
+  useEffect(() => {
+    if (selected === null && !isLoading && !subs.loading && subs.response != null) {
+      for (var i in subs.response.subscriptions) {
+        setSubscription(subs.response.subscriptions[i]);
+        return;
+      }
+    }
+    return () => { setSelected(null); setSubToken(null); };
+  });
   if (isLoading || subs.loading) {
     return <Loading />;
   } else if (subs.response != null) {
