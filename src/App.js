@@ -181,6 +181,8 @@ function Networks() {
     <Container fluid>
       <h2>Networks</h2>
       <DevicesByNetwork devices={devices} />
+      <h3>Add more devices</h3>
+      <GettingStarted />
     </Container>
   );
 }
