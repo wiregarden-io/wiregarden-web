@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useAuth0 } from "@auth0/auth0-react";
+
 import { useAuth } from "./auth.js";
 
 export function useApi(props) {
@@ -7,13 +9,18 @@ export function useApi(props) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const auth = useAuth();
+  const { getAccessTokenSilently } = useAuth0();
 
   async function fetchApi() {
     try {
       setLoading(true);
+      let token = auth !== undefined ? auth.token : await getAccessTokenSilently({
+          audience: "https://wiregarden.io/api/v1",
+          scope: "openid profile email",
+        });
       let resp = await fetch(props.url, {
         headers: {
-          'Authorization': `Bearer ${auth.token}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         method: props.method,
