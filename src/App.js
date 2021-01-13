@@ -117,19 +117,17 @@ function Subscriptions() {
     setSelected(s);
     setSubToken((s !== null) ? s.tokens[0].token : null);
   }
-  // TODO: apply setSubscription in a useEffect hook?
+  // Clear selection on unload
   useEffect(() => {
-    if (selected === null && !isLoading && !subs.loading && subs.response != null) {
-      for (var i in subs.response.subscriptions) {
-        setSubscription(subs.response.subscriptions[i]);
-        return;
-      }
-    }
     return () => { setSelected(null); setSubToken(null); };
-  });
+  }, []);
   if (isLoading || subs.loading) {
     return <Loading />;
   } else if (subs.response != null) {
+    // Select first subscription if none selected
+    if (selected === null && subs.response.subscriptions.length > 0) {
+       setSubscription(subs.response.subscriptions[0]);
+    }
     return (
       <SubscriptionContext.Provider value={selected}>
       <Container fluid><Row noGutters>
@@ -181,7 +179,8 @@ function Networks() {
     <Container fluid>
       <h2>Networks</h2>
       <DevicesByNetwork devices={devices} />
-      <h3>Add more devices</h3>
+      <hr />
+      <h3>Add devices</h3>
       <GettingStarted />
     </Container>
   );
@@ -195,8 +194,7 @@ function DevicesByNetwork(props) {
   }
   if (props.devices.response.devices == null) {
     return <>
-      <p>No devices found. Try adding some?</p>
-      <GettingStarted />
+      <p>No devices found.</p>
     </>;
   }
   return devicesByNetwork(props.devices.response.devices).map((n) => {

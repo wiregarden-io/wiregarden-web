@@ -11,7 +11,7 @@ ReactDOM.render(
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cosmo/bootstrap.min.css" crossOrigin="anonymous" />
   <Auth0Provider
     domain="wiregarden.us.auth0.com"
-    clientId="rdNl3ihM3F21ec5KGLh6rp7f1VHpJuIp"
+    clientId="x5p19wMCugp8MhiLxeTWcGCDSXYktS2h"
     redirectUri={window.location.origin}
     audience="https://wiregarden.io/api/v1"
     scope="openid profile email"
