@@ -9,6 +9,7 @@ import {
   Switch,
   Route,
   Link,
+  Redirect,
   useLocation,
   useHistory,
 } from "react-router-dom";
@@ -19,8 +20,6 @@ import {
   Table,
   Card,
   Spinner,
-  Jumbotron,
-  Carousel,
 } from "react-bootstrap";
 
 import { authContext, useAuth } from './auth.js';
@@ -28,6 +27,10 @@ import { authContext, useAuth } from './auth.js';
 import { useAuth0 } from "@auth0/auth0-react";
 
 import { useApi } from './api.js';
+
+import diagram from './wiregarden-dia.svg';
+
+import { About } from './about.js';
 
 const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
@@ -40,22 +43,18 @@ export default function App() {
     <Router>
       <Navbar bg="light">
       <Navbar.Brand as={Link} to="/">Wiregarden</Navbar.Brand>
-      <Nav activeKey="/" className="mr-auto">
-        {isAuthenticated ? (<Nav.Link as={Link} to="/about">About</Nav.Link>):(<></>)}
+      <Nav className="mr-auto">
+				{isAuthenticated ? (<Nav.Link as={Link} to="/networks">Networks</Nav.Link>) : (<></>)}
         <Nav.Link as={Link} to="/install">Install</Nav.Link>
+        <Nav.Link as={Link} to="/about">About</Nav.Link>
       </Nav>
       <Auth0Nav />
       </Navbar>
       <Switch>
-        <Route exact path="/">{isAuthenticated ? (<Subscriptions />):(<About />)}</Route>
+        <Route exact path="/"><Welcome /></Route>
+        <Route exact path="/networks"><Subscriptions /></Route>
+        <Route exact path="/install"><Install /></Route>
         <Route exact path="/about"><About /></Route>
-        <Route exact path="/console"><Subscriptions /></Route>
-        <Route exact path="/login">
-          <TokenLogin />
-        </Route>
-        <Route exact path="/install">
-          <Install />
-        </Route>
       </Switch>
     </Router>
   );
@@ -87,23 +86,24 @@ function Loading() {
   </Spinner>;
 }
 
-function About() {
-  return <Container fluid>
-    <Carousel>
-      <Carousel.Item>
-        <Jumbotron>
-          <h3>Grow your own private networks with Wiregarden</h3>
-          <p>Wiregarden makes it easy to get started building your own private networks, secured by <a href="https://www.wireguard.com/" target="_">Wireguard</a>.</p>
-        </Jumbotron>
-      </Carousel.Item>
-      <Carousel.Item>
-        <Jumbotron>
-          <h3>Stay connected, stay updated, automatically</h3>
-          <p>Wiregarden operates <a href="https://www.wireguard.com/" target="_">Wireguard</a> to keep all your devices connected.</p>
-        </Jumbotron>
-      </Carousel.Item>
-    </Carousel>
-  </Container>;
+function Welcome() {
+  const { user, isAuthenticated, loginWithRedirect } = useAuth0();
+  return <Container><Row className="align-items-center">
+  <Col sm={6}>
+    <h3>Grow your own networks. Connect your devices.</h3>
+		{isAuthenticated ? (
+      <p>Welcome back {user.nickname || user.name}, let's <Link to="/networks">manage your networks</Link>!</p>
+		 ) : (
+      <>
+        <p>Wiregarden makes it easy to build private networks secured by <a href="https://www.wireguard.com/" target="_">Wireguard</a>.</p>
+        <p><Link onClick={() => loginWithRedirect()}>Login</Link> and <Link to="/install">install</Link> to get started!</p>
+      </>
+     )}
+  </Col>
+  <Col sm={6}>
+      <div><img alt="illustrated wiregarden network" height={768} src={diagram} /></div>
+  </Col>
+  </Row></Container>;
 }
 
 const SubscriptionContext = createContext("subscription");
@@ -275,7 +275,7 @@ function TokenLogin() {
 }
 
 function Install() {
-  return <Container fluid>
+  return <Container>
     <h2>Install Wiregarden</h2>
     <p>Wiregarden is currently only supported on Linux.</p>
 
