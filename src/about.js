@@ -8,16 +8,18 @@ export function About() {
     <h3>What is Wiregarden?</h3>
     <p>Wiregarden is several things:
       <ul>
-        <li>An <i>API service</i>, which models your networks and 
-            propagates that model to all the devices on that network.</li>
-        <li>An <i>agent</i> installed onto each device. The agent tracks network
-            topology and operates wireguard to apply changes in network configuration.</li>
+        <li>An <i>API service</i>, which keeps track of a model of your network
+            and propagates that model to all the devices on that network.</li>
+        <li>An <i>agent</i> installed onto each device. The agent tracks
+            network topology with the API and operates wireguard to apply changes in
+            network configuration.</li>
       </ul>
     </p>
     <h3>What is the status of Wiregarden?</h3>
     <p>Wiregarden is currently in "tech preview". A public service is
        available, to which users can sign up and use immediately. The tech
-       preview is available at no cost.</p>
+       preview is available at no cost.
+    </p>
     <h3>Is Wiregarden stable? Is it production ready?</h3>
     <p>I rely on Wiregarden to connect to my own infrastructure securely. I
        built Wiregarden because I wanted a service just like this, and was not happy with
@@ -26,21 +28,22 @@ export function About() {
     <p>Free access to a tech preview comes with no guarantee of SLA or uptime.
        However I have skin-in-the-game to provide a good experience, improve the
        service, and launch a commercial offering. I don't want to lose access to my
-       devices any more that you do :)
+       devices any more than you do :)
     </p>
-    <h3>I'm having a problem with Wiregarden.</h3>
+    <h3>I'm having a problem with Wiregarden or have a question.</h3>
     <p>Please <a href="https://github.com/wiregarden-io/wiregarden/issues">open
        a Github issue</a> or <a href="mailto:support@wiregarden.io">email</a> if
-       it's more of a private matter or security disclosure.</p>
+       it's more of a private matter or security disclosure.
+    </p>
     <h3>Is Wiregarden a VPN?</h3>
-    <p>In the strict sense of the meaning of that acronym, indeed it is.</p>
+    <p>In the strict sense of the meaning of that acronym, Wiregarden creates VPNs.</p>
     <h3>Does the world really need yet another VPN?</h3>
-    <p>Wiregarden is designed to address a specific use case:&nbsp;
-       <i>private</i> internal networks over existing network substrate. That
-       substrate may be the public internet. However, obscuring or hiding your network
-       identity on the public internet is not its intended purpose. There are plenty
-       of other Wireguard VPNs that are designed for providing public network egress.
-       For example, Mozilla or Cloudflare.
+    <p>Wiregarden is designed for a specific use case:&nbsp;
+       Easy-to-build <i>private</i> internal networks over existing network substrate.
+       That substrate may be the public internet. However, obscuring or hiding your
+       network identity on the public internet is not its intended purpose. There are
+       plenty of other Wireguard VPNs that are designed for providing public network
+       egress, and to scale for this purpose. For example, Mozilla or Cloudflare.
     </p>
     <h3>How is Wiregarden different from other private networking solutions then?</h3>
     <p>
@@ -55,16 +58,16 @@ export function About() {
             using standard commands and configuration files.</li>
       </ul>
     </p>
-    <h3>Can I run my own Wiregarden API server?</h3>
+    <h3>Can I deploy my own Wiregarden API server?</h3>
     <p>Not quite yet, but hopefully soon. I'd like to observe and improve the
        public tech preview instance before making it generally available.
     </p>
     <p>You won't need to talk to a salesperson to do it.</p>
     <h3>When will there be support for more operating systems (macOS, Windows, BSD, etc)</h3>
     <p>Linux is the leading operating system on servers, clouds and embedded
-       devices, so it has priority for this tech preview. Still considering options to
+       devices, so it has priority. Still considering options to
        integrate other OSes with Wiregarden, without getting too mired in OS-specific
-       networking details. </p>
+       networking details.</p>
 
     { /* TODO: Link to survey */ }
 
@@ -92,15 +95,15 @@ export function About() {
        otherwise not interested in who you are, as much as the patterns of usage in
        aggregate.
     </p>
-    <p>Sign-in with Github is provided for convenience, but OAuth isn't
-       mandatory. Feel free to sign up with an isolated email. I don't want your
-       social graph.
+    <p>Sign-in with Github is provided for convenience, but it isn't
+       mandatory. Feel free to sign up with an isolated email. I don't need your
+       social graph :)
     </p>
     <h3>Is Wiregarden "zero-trust" networking?</h3>
     <p>Zero-trust networking is really about defining access policies that
        build trust based on identity, rather than by virtue of being able to connect
        to a network. Wiregarden's network model, by building off of Wireguard,
-       naturally identifies devices by a public key identity.
+       naturally identifies devices by their public key identity.
     </p>
     <p>I would say Wiregarden is zero-trust compatible, and could be used to
        build zero-trust policies. I would be especially interested to hear more about
