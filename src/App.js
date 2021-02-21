@@ -32,6 +32,8 @@ import diagram from './wiregarden-dia.svg';
 
 import { About } from './about.js';
 
+const noSnap = navigator.userAgent !== 'ReactSnap';
+
 const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
   return <Button variant="primary" onClick={() => loginWithRedirect()}>Login</Button>;
@@ -123,7 +125,7 @@ function Subscriptions() {
   useEffect(() => {
     return () => { setSelected(null); setSubToken(null); };
   }, [isAuthenticated]);
-  if (!isAuthenticated) {
+  if (!isAuthenticated && noSnap) {
     loginWithRedirect({redirectUri: window.location.origin + '/install'});
     return;
   }
