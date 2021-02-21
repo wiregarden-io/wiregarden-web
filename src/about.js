@@ -95,9 +95,8 @@ export function About() {
        otherwise not interested in who you are, as much as the patterns of usage in
        aggregate.
     </p>
-    <p>Sign-in with Github is provided for convenience, but it isn't
-       mandatory. Feel free to sign up with an isolated email. I don't need your
-       social graph :)
+	<p>OAuth sign-in with Github is provided for convenience, but it isn't mandatory.
+	   Feel free to sign up with an isolated email if you prefer.
     </p>
     <h3>Is Wiregarden "zero-trust" networking?</h3>
     <p>Zero-trust networking is really about defining access policies that
