@@ -32,6 +32,8 @@ import diagram from './wiregarden-dia.svg';
 
 import { About } from './about.js';
 
+const noSnap = navigator.userAgent !== 'ReactSnap';
+
 const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
   return <Button variant="primary" onClick={() => loginWithRedirect()}>Login</Button>;
@@ -44,9 +46,10 @@ export default function App() {
       <Navbar bg="light">
       <Navbar.Brand as={Link} to="/">Wiregarden</Navbar.Brand>
       <Nav className="mr-auto">
-				{isAuthenticated ? (<Nav.Link as={Link} to="/networks">Networks</Nav.Link>) : (<></>)}
+        {isAuthenticated ? (<Nav.Link as={Link} to="/networks">Networks</Nav.Link>) : (<></>)}
         <Nav.Link as={Link} to="/install">Install</Nav.Link>
         <Nav.Link as={Link} to="/about">About</Nav.Link>
+        <Nav.Link as={Link} to="/contact">Contact</Nav.Link>
       </Nav>
       <Auth0Nav />
       </Navbar>
@@ -55,6 +58,7 @@ export default function App() {
         <Route exact path="/networks"><Subscriptions /></Route>
         <Route exact path="/install"><Install /></Route>
         <Route exact path="/about"><About /></Route>
+        <Route exact path="/contact"><Contact /></Route>
       </Switch>
     </Router>
   );
@@ -91,9 +95,9 @@ function Welcome() {
   return <Container><Row className="align-items-center">
   <Col sm={6}>
     <h3>Grow your own networks. Connect your devices.</h3>
-		{isAuthenticated ? (
+     {isAuthenticated ? (
       <p>Welcome back {user.nickname || user.name}, let's <Link to="/networks">manage your networks</Link>!</p>
-		 ) : (
+     ) : (
       <>
         <p>Wiregarden makes it easy to build private networks secured by <a href="https://www.wireguard.com/" target="_">Wireguard</a>.</p>
         <p><Link onClick={() => loginWithRedirect()}>Login</Link> and <Link to="/install">install</Link> to get started!</p>
@@ -109,7 +113,7 @@ function Welcome() {
 const SubscriptionContext = createContext("subscription");
 
 function Subscriptions() {
-  const { isLoading } = useAuth0();
+  const { isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
   const subs = useApi({method: 'GET', url: '/api/v1/subscription', asJson: true});
   const [selected,setSelected] = useState(null);
   const [subToken,setSubToken] = useState(null);
@@ -120,7 +124,11 @@ function Subscriptions() {
   // Clear selection on unload
   useEffect(() => {
     return () => { setSelected(null); setSubToken(null); };
-  }, []);
+  }, [isAuthenticated]);
+  if (!isAuthenticated && noSnap) {
+    loginWithRedirect({redirectUri: window.location.origin + '/install'});
+    return;
+  }
   if (isLoading || subs.loading) {
     return <Loading />;
   } else if (subs.response != null) {
@@ -233,13 +241,22 @@ function devicesByNetwork(devices) {
   return result;
 }
 
-function GettingStarted() {
+function GettingStarted(props) {
   const token = useContext(authContext);
+  const { isAuthenticated } = useAuth0();
+  var tokenDisplay;
+  if (token !== undefined) {
+    tokenDisplay = token.token
+  } else {
+    tokenDisplay = <i><Link to="/networks">{isAuthenticated ? <>View Networks</> : <>Login</>}</Link>_to_get_your_token</i>
+  }
   return <>
-    <p><Link to="/install">Install Wiregarden</Link> and start a network on a device that will be network-accessible to all the others.</p>
-    <p className="border"><code> sudo env WIREGARDEN_SUBSCRIPTION={token.token} wiregarden up --network my-net --endpoint my-public-ip:my-public-port</code></p>
-    <p>Then add other devices to your network.</p>
-    <p className="border"><code> sudo env WIREGARDEN_SUBSCRIPTION={token.token} wiregarden up --network my-net</code></p>
+    <p>{props.fromInstall ? (<>Start a network</>) : (<>
+      <Link to="/install">Install Wiregarden</Link> and start a network
+    </>)} on a device that will be network-accessible to all the others.</p>
+    <p className="border"><code> sudo env WIREGARDEN_SUBSCRIPTION={tokenDisplay} wiregarden up --network my-net --endpoint my-public-ip:my-public-port</code></p>
+    <p>Add other devices to the network.</p>
+    <p className="border"><code> sudo env WIREGARDEN_SUBSCRIPTION={tokenDisplay} wiregarden up --network my-net</code></p>
   </>
 }
 
@@ -279,13 +296,21 @@ function Install() {
     <h2>Install Wiregarden</h2>
     <p>Wiregarden is currently only supported on Linux.</p>
 
-    <h3>Quick install on Ubuntu LTS</h3>
-    <p>This script installs Wireguard and Wiregarden.</p>
-    <p><code>curl --proto '=https' --tlsv1.2 -sSLf https://wiregarden.io/dist/install | bash</code></p>
+    <h3>1. Download the <a href="https://github.com/wiregarden-io/wiregarden/releases/latest">latest Wiregarden binary release</a> for your platform.</h3>
+    <h3>2. Install into your <code>$PATH</code> as <code>wiregarden</code>.</h3>
+    <p><code>sudo cp wiregarden_linux_amd64 /usr/local/bin/wiregarden</code></p>
+    <p><code>sudo chmod +x /usr/local/bin/wiregarden</code></p>
+    <h3>3. One-time setup</h3>
+    <p>Install Wireguard dependencies and the systemd service agent: <code>sudo wiregarden setup</code></p>
+    <h2>Add devices</h2>
+    <GettingStarted fromInstall={true} />
+  </Container>;
+}
 
-    <h3>Other Linux</h3>
-    <p><a href="https://www.wireguard.com/install/">Install Wireguard</a> for your Linux distribution.</p>
-    <p>Download the <a href="https://github.com/wiregarden-io/wiregarden/releases/latest">latest Wiregarden binary release</a>. Install into your <code>$PATH</code> as <code>wiregarden</code>.</p>
-    <p>Install the systemd service agent with <code>sudo wiregarden daemon install</code>.</p>
+function Contact() {
+  return <Container>
+    <h2>Contact</h2>
+    <p><a href="https://github.com/wiregarden-io">wiregarden-io on Github</a></p>
+    <p><a href="mailto:support@wiregarden.io">Email support@wiregarden.io</a></p>
   </Container>;
 }
