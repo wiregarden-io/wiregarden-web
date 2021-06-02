@@ -9,9 +9,6 @@ import {
   Switch,
   Route,
   Link,
-  Redirect,
-  useLocation,
-  useHistory,
 } from "react-router-dom";
 import {
   Container,
@@ -22,7 +19,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 
-import { authContext, useAuth } from './auth.js';
+import { authContext } from './auth.js';
 
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -258,37 +255,6 @@ function GettingStarted(props) {
     <p>Add other devices to the network.</p>
     <p className="border"><code> sudo env WIREGARDEN_SUBSCRIPTION={tokenDisplay} wiregarden up --network my-net</code></p>
   </>
-}
-
-function useInput(initialValue){
-  const [value,setValue] = useState(initialValue);
-  function handleChange(e){
-    setValue(e.target.value);
-  }
-  return [value,handleChange];
-}
-
-function TokenLogin() {
-  const [input, setInput] = useInput('');
-  const auth = useAuth();
-  let history = useHistory();
-  let location = useLocation();
-  let { from } = location.state || { from: { pathname: "/" } };
-  function handleLogin(e) {
-    e.preventDefault();
-    if (input !== "") {
-      auth.setToken(input);
-      history.replace(from);
-    } else {
-      // TODO: flash message
-    }
-  }
-  return (
-    <form>
-      <div><textarea placeholder="User Token" value={input} onChange={setInput} /></div>
-      <div><button onClick={handleLogin}>Login</button></div>
-    </form>
-  );
 }
 
 function Install() {
