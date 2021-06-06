@@ -1,0 +1,16 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    name: CI Build
+    runs-on: ubuntu-latest
+    container: ghcr.io/wiregarden-io/wiregarden-web-builder:latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: yarn install
+    - run: yarn build
